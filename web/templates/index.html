@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crop Disease Detective</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 550px;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .drop-zone {
+        border: 2px dashed #4caf50;
+        border-radius: 15px;
+        padding: 30px;
+        cursor: pointer;
+        transition: 0.3s;
+        background: #f9fff9;
+    }
+
+    .drop-zone:hover {
+        background: #eef8ee;
+    }
+
+    #preview {
+        max-width: 100%;
+        border-radius: 15px;
+        margin-top: 20px;
+        display: none;
+    }
+
+    .loader {
+        display: none;
+    }
+
+    .confidence-bar {
+        height: 20px;
+        border-radius: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card text-center">
+    <h2 class="mb-3">🌱 Crop Disease Detective</h2>
+    <p class="text-muted">Upload a leaf image and let AI diagnose plant disease</p>
+
+    <form id="upload-form" enctype="multipart/form-data">
+
+        <div class="drop-zone mb-3" id="drop-zone">
+            <input type="file" id="file" name="file" accept="image/*" hidden required>
+            <p class="mb-0 fw-semibold">📂 Click or Drag & Drop Image Here</p>
+        </div>
+
+        <button class="btn btn-success w-100" type="submit">
+            🔍 Analyze Plant
+        </button>
+    </form>
+
+    <img id="preview" alt="Preview">
+
+    <!-- Loader -->
+    <div class="loader mt-4" id="loader">
+        <div class="spinner-border text-success" role="status"></div>
+        <p class="mt-2">Analyzing image with AI…</p>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="mt-4" style="display:none;">
+        <h4 class="fw-bold">
+            Diagnosis: <span id="disease-name" class="text-success"></span>
+        </h4>
+
+        <p class="mb-1">Confidence</p>
+        <div class="progress">
+            <div id="confidence-bar" 
+                 class="progress-bar bg-success confidence-bar" 
+                 role="progressbar">
+            </div>
+        </div>
+
+        <button class="btn btn-outline-secondary mt-3" onclick="resetApp()">
+            🔄 Analyze Another Image
+        </button>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById('upload-form');
+const fileInput = document.getElementById('file');
+const dropZone = document.getElementById('drop-zone');
+const preview = document.getElementById('preview');
+const loader = document.getElementById('loader');
+const resultDiv = document.getElementById('result');
+
+// Drag & Drop
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('bg-light');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('bg-light');
+});
+
+dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    fileInput.files = e.dataTransfer.files;
+    showPreview();
+});
+
+// Preview
+fileInput.onchange = showPreview;
+
+function showPreview() {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+    resultDiv.style.display = "none";
+}
+
+// Submit
+form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    loader.style.display = "block";
+    resultDiv.style.display = "none";
+
+    const formData = new FormData(form);
+
+    try {
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        loader.style.display = "none";
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById('disease-name').innerText = data.class;
+
+        const confidence = Math.round(data.confidence * 100);
+        const bar = document.getElementById('confidence-bar');
+        bar.style.width = confidence + "%";
+        bar.innerText = confidence + "%";
+
+        resultDiv.style.display = "block";
+
+    } catch (err) {
+        loader.style.display = "none";
+        alert("Server error. Please try again.");
+    }
+};
+
+function resetApp() {
+    preview.style.display = "none";
+    resultDiv.style.display = "none";
+    form.reset();
+}
+</script>
+
+</body>
+</html>
