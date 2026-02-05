@@ -1,29 +1,25 @@
 import os
-import json
 import sys
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
+from werkzeug.utils import secure_filename
 
-# Add parent dir to path to import config
+# Add parent directory to path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
+from src.inference_pipeline import predictor  # The Robust Brain
 
 app = Flask(__name__)
+app.secret_key = "super_secret_key_for_flash_messages" # Needed for safety
 
-# Load Model Once
-print("Loading model...")
-model = load_model(config.MODEL_PATH)
-with open(config.CLASS_INDICES_PATH, 'r') as f:
-    class_indices = json.load(f)
+# Configure Upload Folder
+UPLOAD_FOLDER = os.path.join(config.BASE_DIR, 'web', 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def prepare_image(img_path):
-    img = image.load_img(img_path, target_size=config.IMG_SIZE)
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/', methods=['GET'])
 def index():
@@ -31,38 +27,44 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    # 1. Validation: Check if file exists
     if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'})
+        flash('No file part')
+        return redirect(request.url)
     
     file = request.files['file']
+    
     if file.filename == '':
-        return jsonify({'error': 'No file selected'})
+        flash('No selected file')
+        return redirect(request.url)
 
-    # Save temp file
-    upload_path = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
-    if not os.path.exists(upload_path):
-        os.makedirs(upload_path)
-        
-    filepath = os.path.join(upload_path, file.filename)
-    file.save(filepath)
+    if file and allowed_file(file.filename):
+        # 2. Save File Securely
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
 
-    # Predict
-    try:
-        processed_img = prepare_image(filepath)
-        prediction = model.predict(processed_img)
+        # 3. call the ROBUST PIPELINE (The Brain)
+        # This uses TTA (Test Time Augmentation) and Confidence Checks
+        result = predictor.predict_robust(filepath)
+
+        # 4. Handle different outcomes
+        if result['status'] == 'Success':
+            return render_template('result.html', 
+                                   img_filename=filename, 
+                                   data=result)
         
-        predicted_class_index = np.argmax(prediction, axis=1)[0]
-        confidence = np.max(prediction)
-        
-        result_class = class_indices.get(str(predicted_class_index), "Unknown")
-        
-        return jsonify({
-            'class': result_class,
-            'confidence': f"{confidence * 100:.2f}%",
-            'image_url': filepath
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)})
+        elif result['status'] == 'Unsure':
+            flash(f"⚠️ {result['message']} (Confidence: {result['confidence']})")
+            return redirect(url_for('index'))
+            
+        elif result['status'] == 'Invalid':
+            flash(f"⛔ {result['message']}")
+            return redirect(url_for('index'))
+
+    flash('Invalid file type. Please upload JPG or PNG.')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Run on all interfaces for local network testing
+    app.run(host='0.0.0.0', port=5000, debug=True)
