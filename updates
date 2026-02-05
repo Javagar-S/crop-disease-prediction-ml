@@ -1,0 +1,215 @@
+# 🌱 Crop Disease Prediction System (Machine Learning)
+
+This repository contains a **professional, end-to-end Crop Disease Prediction system** built using **Deep Learning (EfficientNet)** and **Flask**. The project goes beyond basic model training and demonstrates a **production-style ML pipeline** including preprocessing, training, inference, and a web-based user interface.
+
+The system is designed to:
+
+* Train a robust crop disease classification model
+* Handle real-world image uploads
+* Provide **confidence-aware predictions**
+* Display **disease remedies and precautions**
+
+This project is suitable for **academic submissions, interviews, and applied ML portfolios**.
+
+---
+
+## 📂 Project Structure Overview
+
+```
+crop_disease_system/
+│
+├── config.py                   # Central configuration (image size, paths, thresholds)
+├── requirements.txt            # Project dependencies
+│
+├── data/                       # Dataset storage
+│   ├── raw/                    # Original dataset (PlantVillage + Background_Noise)
+│   ├── train/                  # Auto-generated training data
+│   └── val/                    # Auto-generated validation data
+│
+├── models/                     # Trained models & knowledge base
+│   ├── efficientnet_best.h5    # Best trained model (saved automatically)
+│   ├── class_indices.json      # Class ID → Disease name mapping
+│   └── disease_info.json       # Disease remedies & precautions
+│
+├── src/                        # Core ML logic
+│   ├── preprocess.py           # Dataset splitting & preprocessing
+│   ├── model_builder.py        # EfficientNet architecture definition
+│   ├── train_advanced.py       # Advanced training pipeline
+│   └── inference_pipeline.py   # Robust prediction logic (TTA + safety checks)
+│
+└── web/                        # Web application
+    ├── app.py                  # Flask backend
+    ├── static/
+    │   └── uploads/            # Temporary user uploads
+    └── templates/
+        ├── index.html          # Upload page
+        └── result.html         # Prediction & remedy report
+```
+
+---
+
+## 🚀 Getting Started
+
+Follow the steps below **exactly in VS Code using a new terminal**.
+
+---
+
+## 🔧 Installation & Setup
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/Javagar-S/crop-disease-prediction-ml.git
+cd crop-disease-prediction-ml
+```
+
+---
+
+### 2️⃣ Create and Activate Virtual Environment
+
+#### 🪟 Windows
+
+```bash
+python -m venv crop
+crop\Scripts\activate
+```
+
+#### 🐧 Linux / 🍎 macOS
+
+```bash
+python3 -m venv crop
+source crop/bin/activate
+```
+
+---
+
+### 3️⃣ Install Required Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 📊 Dataset Preparation
+
+1. Place your dataset inside:
+
+   ```
+   data/raw/
+   ```
+
+   (Each disease must be in its own folder)
+
+2. Run the preprocessing script **once**:
+
+```bash
+python src/preprocess.py
+```
+
+This will automatically:
+
+* Shuffle the dataset
+* Split it into training and validation sets
+* Create `data/train/` and `data/val/`
+
+---
+
+## 🧠 Model Training
+
+Train the model using the advanced training pipeline:
+
+```bash
+python src/train_advanced.py
+```
+
+### ✔ Training Features
+
+* EfficientNet backbone
+* Class weighting for imbalance
+* Validation-based checkpoint saving
+* Automatic best-model selection
+
+The best model will be saved to:
+
+```
+models/efficientnet_best.h5
+```
+
+> ⚠️ Training on CPU is slow. For faster results, Google Colab with GPU is recommended.
+
+---
+
+## 🌐 Run the Web Application
+
+Once training is complete (or if a trained model already exists), start the Flask app:
+
+```bash
+python web/app.py
+```
+
+Then open your browser and go to:
+
+```
+http://127.0.0.1:5000/
+```
+
+---
+
+## 🧪 How Prediction Works (Behind the Scenes)
+
+* Uploaded images are validated and resized
+* Test-Time Augmentation (TTA) is applied
+* Model confidence is checked against a threshold
+* Disease information is fetched from `disease_info.json`
+* Results are displayed with confidence and remedies
+
+---
+
+## 📌 Configuration
+
+All important settings are controlled from:
+
+```
+config.py
+```
+
+You can change:
+
+* Image size
+* Confidence threshold
+* Dataset paths
+* Model paths
+
+No other file needs manual modification.
+
+---
+
+## 🎯 Project Highlights
+
+* End-to-end ML pipeline
+* Real-world inference safeguards
+* Clean modular architecture
+* Interview-ready ML project
+* Extendable to more crops and diseases
+
+---
+
+## 📈 Future Improvements
+
+* GPU-based training
+* Multi-crop support
+* REST API deployment
+* Mobile-friendly frontend
+* Model explainability (Grad-CAM)
+
+---
+
+## 👤 Author
+
+**Javagar.S**
+Machine Learning | Data Science | AI Systems
+
+---
+
+✅ This project demonstrates **applied machine learning**, not just model training.
