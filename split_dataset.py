@@ -18,7 +18,7 @@ def split_data():
     categories = os.listdir(SOURCE)
     
     for cat in categories:
-        cat_path = os.path.join(SOURCE, cat)
+        cat_path = os.path.join(SOURCE, cat) 
         
         # skip files or metadata folders
         if not os.path.isdir(cat_path) or cat.startswith('.'):
