@@ -8,12 +8,15 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 
+# --- FIXED IMPORT: Pointing to 'disease_info.py' ---
+from models.disease_info import plant_disease_info
+
 class DiseasePredictor:
     def __init__(self):
         print("⚙️ Loading Robust Model...")
         self.model = tf.keras.models.load_model(config.MODEL_PATH)
         
-        # --- FIXED SECTION START ---
+        # --- FIXED SECTION START: Loading Class Labels ---
         with open(config.CLASS_INDICES_PATH, 'r') as f:
             raw_indices = json.load(f)
             
@@ -31,8 +34,9 @@ class DiseasePredictor:
         print(f"✅ Class Labels Loaded: {len(self.labels)} classes found.")
         # --- FIXED SECTION END ---
             
-        with open(config.DISEASE_INFO_PATH, 'r') as f:
-            self.knowledge_base = json.load(f)
+        # --- NEW: Link directly to the imported Python dictionary ---
+        # No json.load() needed anymore!
+        self.knowledge_base = plant_disease_info
 
     def preprocess(self, img_array):
         # EfficientNet expects raw 0-255 inputs, but we standardize size
@@ -72,7 +76,7 @@ class DiseasePredictor:
         if confidence < config.CONFIDENCE_THRESHOLD:
             return {
                 "status": "Unsure",
-                "message": "Model could not identify a leaf with high confidence.",
+                "message": f"Low confidence ({confidence:.0%}). Please upload a clearer image.",
                 "confidence": f"{confidence:.2f}"
             }
         
@@ -84,16 +88,22 @@ class DiseasePredictor:
                 "confidence": f"{confidence:.2f}"
             }
 
-        # 6. Fetch Knowledge
+        # 6. Fetch Knowledge (Dynamic)
+        # We get the info matching the class_key (e.g. "Tomato_Early_blight")
+        # .get() returns an empty dict {} if the disease isn't found, preventing crashes
         info = self.knowledge_base.get(class_key, {})
         
+        # 7. Return the RICH structure required by result.html
         return {
             "status": "Success",
-            "prediction": info.get("name", class_key),
-            "confidence": f"{confidence:.2%}",
-            "remedies": info.get("remedies", ["No specific remedy data available."]),
-            "precautions": info.get("precautions", ["No specific precautions available."]),
-            "severity": info.get("status", "Unknown")
+            "prediction": info.get("name", class_key.replace("_", " ")),
+            "scientific_name": info.get("scientific_name", "N/A"),
+            "description": info.get("description", "No description available."),
+            "confidence": f"{confidence:.1%}",
+            "severity": info.get("severity", "Unknown"),
+            "symptoms": info.get("symptoms", []),
+            "treatment_plan": info.get("treatment_plan", []),
+            "prevention": info.get("prevention", [])
         }
 
 # Singleton instance

@@ -4,211 +4,405 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analysis Report | CropGuard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <style>
         :root {
-            --primary-green: #2E7D32;
-            --healthy-green: #43A047;
-            --warning-orange: #FB8C00;
-            --critical-red: #D32F2F;
-            --bg-gradient: linear-gradient(135deg, #1b5e20 0%, #4caf50 100%);
+            --primary: #10b981;
+            --primary-dark: #064e3b;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: url('https://images.unsplash.com/photo-1599687267812-35c05ff70ee9?q=80&w=2072&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
-            padding-bottom: 50px;
+            color: var(--text-main);
         }
 
-        .report-container {
-            margin-top: 50px;
-            animation: fadeIn 0.8s ease-in-out;
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(120deg, rgba(15, 46, 33, 0.95) 0%, rgba(15, 46, 33, 0.7) 100%);
+            z-index: -1;
         }
 
-        .card-glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            overflow: hidden;
+        /* Navbar */
+        .navbar { padding: 1.5rem !important; }
+        .btn-switch {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2); color: white;
+            padding: 10px 24px; border-radius: 50px; font-weight: 600;
+            display: flex; align-items: center; gap: 8px; text-decoration: none; transition: 0.3s;
+        }
+        .btn-switch:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+
+        /* Main Panel */
+        .dashboard-container {
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; margin-top: 40px; min-height: 80vh;
+        }
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border); border-radius: 32px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
+            overflow: hidden; width: 100%; max-width: 1100px;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Image Styling */
-        .leaf-image {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-bottom: 5px solid var(--primary-green);
+        /* Left Visuals */
+        .visual-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            padding: 40px; border-right: 1px solid rgba(0,0,0,0.05);
+        }
+        .image-container {
+            position: relative; width: 100%; border-radius: 24px; overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-bottom: 30px;
+        }
+        .leaf-img { width: 100%; height: 380px; object-fit: cover; display: block; }
+        
+        /* Floating Mic */
+        .btn-voice-float {
+            position: absolute; top: 15px; right: 15px; width: 45px; height: 45px;
+            background: rgba(255, 255, 255, 0.9); border-radius: 50%; border: none;
+            color: var(--primary-dark); display: grid; place-items: center; font-size: 1.2rem;
+            cursor: pointer; transition: 0.3s; z-index: 10;
+        }
+        .speaking { animation: pulseRed 1.5s infinite; background: #ef4444; color: white; }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 100% { box-shadow: 0 0 0 15px rgba(0,0,0,0); } }
+
+        /* Confidence Ring */
+        .confidence-row {
+            display: flex; align-items: center; gap: 20px; background: white;
+            padding: 20px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .confidence-ring {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: conic-gradient(var(--primary) var(--deg), #e2e8f0 0deg);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .ring-inner {
+            width: 55px; height: 55px; background: white; border-radius: 50%;
+            display: grid; place-items: center; font-weight: 800; color: var(--primary-dark);
         }
 
-        /* Dynamic Status Colors */
-        .status-healthy { color: var(--healthy-green); }
-        .status-warning { color: var(--warning-orange); }
-        .status-critical { color: var(--critical-red); }
+        /* Right Content */
+        .content-section { padding: 40px 50px; background: white; height: 100%; display: flex; flex-direction: column; }
+        .hero-title {
+            font-weight: 800; background: linear-gradient(135deg, #0f2e21 0%, #10b981 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1.1; margin-bottom: 5px;
+        }
+        .severity-pill {
+            padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: inline-block;
+        }
+        .pill-Critical { background: #fee2e2; color: #b91c1c; }
+        .pill-Warning { background: #ffedd5; color: #c2410c; }
+        .pill-Healthy { background: #dcfce7; color: #15803d; }
 
-        .badge-custom {
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            border-radius: 30px;
-            letter-spacing: 0.5px;
+        /* Timeline UI */
+        .timeline-container { position: relative; padding-left: 20px; border-left: 2px solid #e2e8f0; margin-left: 10px; }
+        .timeline-item { position: relative; margin-bottom: 25px; }
+        .timeline-dot {
+            position: absolute; left: -26px; top: 0; width: 12px; height: 12px;
+            border-radius: 50%; background: var(--primary); border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+        .timeline-card {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px;
+            transition: 0.2s;
         }
 
-        /* Section Headers */
-        .section-title {
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
+        /* Tabs */
+        .nav-pills { background: #f8fafc; padding: 6px; border-radius: 14px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        .nav-link { color: var(--text-muted); font-weight: 600; border-radius: 10px; padding: 10px; transition: 0.2s; font-size: 0.9rem; }
+        .nav-link.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 
-        .remedy-card, .precaution-card {
-            border-left: 5px solid;
-            background: #fff;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+        /* Action Button */
+        .btn-tech {
+            background: var(--primary-dark); color: white; border: none; padding: 16px;
+            border-radius: 16px; font-weight: 700; width: 100%; margin-top: auto;
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
+        .btn-tech:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.4); }
 
-        .remedy-card { border-color: #0288D1; }
-        .precaution-card { border-color: #7B1FA2; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
-        .remedy-card:hover, .precaution-card:hover {
-            transform: translateX(5px);
-        }
+        /* ==========================================================================
+           PROFESSIONAL PRINT ENGINE (FIXES PDF ISSUES)
+           ========================================================================== */
+        @media print {
+            @page { margin: 1cm; size: A4 portrait; }
+            
+            body { 
+                background: white !important; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;
+                color: black !important;
+            }
 
-        .btn-back {
-            background: #fff;
-            color: var(--primary-green);
-            font-weight: 600;
-            border-radius: 50px;
-            padding: 10px 30px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        .btn-back:hover {
-            background: var(--primary-green);
-            color: #fff;
-            border-color: #fff;
-        }
+            /* Hide interactive elements */
+            .bg-overlay, .navbar, .btn-no-print, .nav-pills, .btn-voice-float, .btn-tech { 
+                display: none !important; 
+            }
+            
+            /* RESET LAYOUT FOR A4 PAPER */
+            .dashboard-container { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                display: block !important; 
+            }
+            .glass-panel { 
+                box-shadow: none !important; 
+                border: none !important; 
+                border-radius: 0 !important; 
+                max-width: 100% !important; 
+            }
+            .row { display: block !important; }
+            .col-lg-5, .col-lg-7 { width: 100% !important; padding: 0 !important; }
+            
+            /* SHOW IMAGE AT TOP */
+            .visual-section { 
+                display: block !important; 
+                background: white !important; 
+                border-bottom: 2px solid #000;
+                padding-bottom: 20px !important;
+                margin-bottom: 20px;
+            }
+            .image-container { 
+                width: 200px !important; 
+                height: 200px !important; 
+                float: left;
+                margin-right: 30px;
+                border: 1px solid #ddd;
+            }
+            .leaf-img { height: 100% !important; object-fit: contain !important; }
+            
+            /* SHOW CONFIDENCE SCORE */
+            .confidence-row { 
+                border: none !important; 
+                padding: 20px 0 !important; 
+                display: block !important;
+            }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            /* FORCE SHOW CONTENT */
+            .content-section { 
+                padding: 0 !important; 
+                height: auto !important; 
+                display: block !important; 
+            }
+            .tab-content { 
+                height: auto !important; 
+                overflow: visible !important; 
+                max-height: none !important; /* Unroll scrollbar */
+            }
+            .tab-pane { 
+                display: block !important; 
+                opacity: 1 !important; 
+                margin-bottom: 40px; 
+                page-break-inside: avoid; 
+            }
+            
+            /* ADD PRINT HEADERS */
+            .tab-pane::before {
+                content: attr(data-print-title);
+                display: block;
+                font-size: 1.4rem;
+                font-weight: 800;
+                color: #0f2e21;
+                margin-bottom: 10px;
+                text-decoration: underline;
+            }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-transparent pt-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/"><i class="bi bi-flower1"></i> CropGuard</a>
-        <a href="/" class="btn btn-back"><i class="bi bi-arrow-left"></i> New Analysis</a>
-    </div>
-</nav>
+    <div class="bg-overlay"></div>
 
-<div class="container report-container">
-    <div class="row g-4">
-        
-        <div class="col-lg-5">
-            <div class="card card-glass h-100">
-                <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" class="leaf-image" alt="Analyzed Leaf">
-                <div class="card-body text-center p-4">
-                    <h5 class="text-muted mb-3">AI Confidence Analysis</h5>
-                    
-                    <div class="progress" style="height: 25px; border-radius: 15px; background: #e0e0e0;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
-                             role="progressbar" 
-                             style="width: {{ data.confidence }}; font-weight:bold;">
-                             {{ data.confidence }}
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <small class="text-muted d-block">Scan ID: #{{ img_filename[:8] }}</small>
-                        <small class="text-muted">Model: EfficientNetB0-Pro</small>
-                    </div>
-                </div>
+    <nav class="navbar navbar-expand-lg fixed-top px-4 btn-no-print">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold fs-3 d-flex align-items-center gap-2" href="/">
+                <i class="bi bi-leaf-fill text-success fs-2"></i> CropGuard
+            </a>
+            <div class="d-flex gap-2">
+                <a href="/" class="btn-switch">
+                    <i class="bi bi-arrow-repeat"></i> New Scan
+                </a>
             </div>
         </div>
+    </nav>
 
-        <div class="col-lg-7">
-            <div class="card card-glass h-100">
-                <div class="card-body p-5">
-                    
-                    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="dashboard-container">
+        <div class="glass-panel">
+            <div class="row g-0">
+                
+                <div class="col-lg-5 visual-section">
+                    <div class="image-container">
+                        <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" class="leaf-img" alt="Leaf Analysis">
+                        <button class="btn-voice-float btn-no-print" onclick="toggleSpeech()" title="Read Diagnosis">
+                            <i class="bi bi-mic-fill" id="micIcon"></i>
+                        </button>
+                    </div>
+
+                    <div class="confidence-row w-100">
+                        <div class="confidence-ring" id="confidenceRing" style="--deg: 0deg;">
+                            <div class="ring-inner">{{ data.confidence }}</div>
+                        </div>
                         <div>
-                            <h6 class="text-uppercase text-muted fw-bold ls-1">Diagnosis Result</h6>
-                            <h2 class="fw-bold mb-0 
-                                {% if data.severity == 'Critical' %} status-critical
-                                {% elif data.severity == 'Warning' %} status-warning
-                                {% else %} status-healthy {% endif %}">
-                                {{ data.prediction }}
-                            </h2>
+                            <h5 class="fw-bold text-dark mb-0">AI Confidence</h5>
+                            <p class="text-muted small mb-0">Analysis Reliability Score</p>
                         </div>
-                        <span class="badge badge-custom 
-                            {% if data.severity == 'Critical' %} bg-danger
-                            {% elif data.severity == 'Warning' %} bg-warning text-dark
-                            {% else %} bg-success {% endif %}">
-                            {{ data.severity }}
+                    </div>
+                </div>
+
+                <div class="col-lg-7 content-section">
+                    
+                    <div class="mb-4">
+                        <span class="severity-pill pill-{{ data.severity }}">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i> {{ data.severity }}
                         </span>
+                        <h1 class="hero-title display-5">{{ data.prediction }}</h1>
+                        <p class="text-muted fst-italic">{{ data.scientific_name }}</p>
                     </div>
 
-                    <hr class="opacity-10 mb-5">
+                    <p class="text-secondary mb-4" style="line-height: 1.6;">{{ data.description }}</p>
 
-                    <div class="row">
-                        <div class="col-md-12 mb-4">
-                            <h5 class="section-title text-primary">
-                                <i class="bi bi-prescription2 me-2"></i> Recommended Treatment
-                            </h5>
-                            {% if data.remedies %}
-                                <div class="list-group">
-                                    {% for remedy in data.remedies %}
-                                    <div class="list-group-item remedy-card border-0 py-3">
-                                        <div class="d-flex">
-                                            <i class="bi bi-check-circle-fill text-primary me-3 mt-1"></i>
-                                            <span>{{ remedy }}</span>
+                    <ul class="nav nav-pills btn-no-print" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active w-100" data-bs-toggle="pill" data-bs-target="#treatment">Timeline</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link w-100" data-bs-toggle="pill" data-bs-target="#symptoms">Symptoms</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link w-100" data-bs-toggle="pill" data-bs-target="#prevent">Prevention</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content flex-grow-1" id="pills-tabContent" style="overflow-y: auto; max-height: 300px; padding-right: 5px;">
+                        
+                        <div class="tab-pane fade show active" id="treatment" data-print-title="Recommended Cure Plan">
+                            {% if data.severity == 'Healthy' %}
+                                <div class="alert alert-success d-flex align-items-center gap-3 p-4 rounded-4 border-0 bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-check-circle-fill fs-2"></i>
+                                    <div>
+                                        <h5 class="fw-bold mb-1">Plant is Healthy!</h5>
+                                        <p class="mb-0 small">No medical action required.</p>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="timeline-container">
+                                    {% for step in data.treatment_plan %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-card">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span class="badge bg-white text-dark border">{{ step.frequency }}</span>
+                                                <small class="text-muted">{{ step.type }}</small>
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-1">{{ step.action }}</h6>
+                                            <small class="text-muted">{{ step.duration }}</small>
                                         </div>
                                     </div>
                                     {% endfor %}
                                 </div>
-                            {% else %}
-                                <p class="text-muted fst-italic">No specific treatment required.</p>
                             {% endif %}
                         </div>
 
-                        <div class="col-md-12">
-                            <h5 class="section-title text-purple" style="color: #7B1FA2;">
-                                <i class="bi bi-shield-check me-2"></i> Future Prevention
-                            </h5>
-                            {% if data.precautions %}
-                                <div class="list-group">
-                                    {% for precaution in data.precautions %}
-                                    <div class="list-group-item precaution-card border-0 py-3">
-                                        <div class="d-flex">
-                                            <i class="bi bi-shield-lock-fill me-3 mt-1" style="color: #7B1FA2;"></i>
-                                            <span>{{ precaution }}</span>
+                        <div class="tab-pane fade" id="symptoms" data-print-title="Verified Symptoms">
+                            <ul class="list-group list-group-flush">
+                                {% for item in data.symptoms %}
+                                <li class="list-group-item border-0 px-0 py-2 d-flex gap-3 align-items-start">
+                                    <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                    <span class="fw-medium text-dark">{{ item }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="tab-pane fade" id="prevent" data-print-title="Future Prevention">
+                            <div class="row g-3">
+                                {% for item in data.prevention %}
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded-4 h-100 border d-flex gap-3">
+                                        <i class="bi bi-shield-check text-primary fs-4"></i>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Step {{ loop.index }}</h6>
+                                            <p class="mb-0 text-muted small">{{ item }}</p>
                                         </div>
                                     </div>
-                                    {% endfor %}
                                 </div>
-                            {% else %}
-                                <p class="text-muted fst-italic">Standard crop care recommended.</p>
-                            {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
+
                     </div>
+
+                    <button onclick="window.print()" class="btn-tech mt-4 btn-no-print">
+                        <i class="bi bi-printer-fill"></i> Download leaf Report
+                    </button>
 
                 </div>
             </div>
         </div>
-
     </div>
-</div>
 
+    <div id="speechText" class="d-none">
+        Report for {{ data.prediction }}. Status is {{ data.severity }}.
+        {{ data.description }}
+        Recommended action:
+        {% for step in data.treatment_plan[:2] %}
+            {{ step.action }}.
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 1. Ring Animation
+        window.addEventListener('load', () => {
+            const ring = document.getElementById('confidenceRing');
+            const textVal = "{{ data.confidence }}".replace('%','');
+            const val = parseFloat(textVal); 
+            const deg = 360 * (val / 100);
+            setTimeout(() => { ring.style.setProperty('--deg', deg + 'deg'); }, 500);
+        });
+
+        // 2. Voice Logic
+        let isSpeaking = false;
+        function toggleSpeech() {
+            const btn = document.querySelector('.btn-voice-float');
+            const icon = document.getElementById('micIcon');
+            
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                btn.classList.remove('speaking');
+                icon.className = 'bi bi-mic-fill';
+            } else {
+                const text = document.getElementById('speechText').innerText;
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.rate = 0.9;
+                
+                msg.onend = () => {
+                    isSpeaking = false;
+                    btn.classList.remove('speaking');
+                    icon.className = 'bi bi-mic-fill';
+                };
+
+                window.speechSynthesis.speak(msg);
+                isSpeaking = true;
+                btn.classList.add('speaking');
+                icon.className = 'bi bi-soundwave';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -3,241 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CropGuard | AI Disease Doctor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>CropGuard | Precision Agriculture</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <style>
         :root {
-            --primary-green: #2E7D32; /* Forest Green */
-            --light-green: #E8F5E9;
-            --bg-gradient: linear-gradient(135deg, #1b5e20 0%, #4caf50 100%);
+            --primary: #059669;       /* Emerald 600 */
+            --primary-dark: #064e3b;  /* Emerald 900 */
+            --accent: #34d399;        /* Emerald 400 */
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-dark: #0f172a;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            /* Macro Leaf Veins Background */
+            background: url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2072&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dark Overlay to make text pop */
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.9), rgba(0,0,0,0.4));
+            z-index: -1;
+        }
+
+        /* --- Navbar --- */
+        .weather-pill {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .weather-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* --- Main Glass Card --- */
+        .glass-container {
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
-        .main-card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px); /* Glassmorphism */
+        .main-glass {
+            background: rgba(255, 255, 255, 0.85); /* Frosty White */
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4);
             overflow: hidden;
-            animation: slideUp 0.8s ease-out;
+            width: 100%;
+            max-width: 1200px;
+            animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .upload-area {
-            border: 2px dashed #bdbdbd;
-            border-radius: 15px;
-            padding: 40px 20px;
+        /* --- Left Side: Content --- */
+        .hero-title {
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        /* --- STATS TILES --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+            border-color: var(--primary);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* --- Right Side: Upload --- */
+        .upload-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            padding: 50px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 24px;
+            background: white;
+            padding: 40px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
+            transition: 0.3s;
             position: relative;
+            overflow: hidden;
         }
 
-        .upload-area:hover, .upload-area.dragover {
-            border-color: var(--primary-green);
-            background-color: var(--light-green);
-            transform: scale(1.02);
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: #ecfdf5;
+            transform: scale(1.01);
         }
 
-        .upload-icon {
-            font-size: 3rem;
-            color: var(--primary-green);
-            margin-bottom: 15px;
-        }
-
-        /* Image Preview Styling */
-        #preview-container {
+        .scan-laser {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: #10b981;
+            box-shadow: 0 0 20px #10b981;
+            animation: scan 1.5s ease-in-out infinite;
             display: none;
-            margin-top: 20px;
+            z-index: 10;
         }
-        
-        #image-preview {
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        #preview-img {
             max-width: 100%;
-            max-height: 250px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border: 2px solid var(--primary-green);
+            max-height: 280px;
+            border-radius: 12px;
+            display: none;
+            margin: 0 auto;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
         .btn-analyze {
-            background: var(--primary-green);
+            background: var(--primary-dark);
+            color: white;
+            padding: 18px;
+            border-radius: 16px;
             border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn-analyze:hover {
-            background: #1B5E20;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.4);
-        }
-
-        .logo-text {
-            color: var(--primary-green);
             font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
-            z-index: 9999;
-            flex-direction: column;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 25px;
+            transition: 0.3s;
+            display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
+            gap: 10px;
         }
-        
+        .btn-analyze:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Voice Button */
+        .btn-voice {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-dark);
+            border: none;
+            transition: 0.3s;
+            display: grid;
+            place-items: center;
+        }
+        .btn-voice:hover { background: var(--primary); color: white; }
+        .speaking { animation: pulse 1.5s infinite; background: #ef4444; color: white; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(50px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading */
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loadingOverlay">
-    <div class="spinner-border text-success" style="width: 3rem; height: 3rem;" role="status"></div>
-    <h4 class="mt-4 text-success fw-bold">Analyzing Plant Health...</h4>
-    <p class="text-muted">Consulting AI Knowledge Base</p>
-</div>
+    <div class="bg-overlay"></div>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-5">
+    <div class="loader-overlay" id="loader">
+        <div class="spinner-border text-success" style="width: 4rem; height: 4rem;" role="status"></div>
+        <h3 class="mt-4 fw-bold" style="color: var(--primary-dark);">Analyzing Leaf Tissue...</h3>
+        <p class="text-muted">Comparing with 15,000+ samples</p>
+    </div>
+
+    <nav class="navbar navbar-expand-lg px-4 pt-4 fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold fs-3 d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-leaf-fill text-success fs-2"></i> CropGuard
+            </a>
             
-            <div class="card main-card p-4">
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <h2 class="logo-text"><i class="bi bi-flower1"></i> CropGuard</h2>
-                        <p class="text-muted">AI-Powered Disease Diagnosis</p>
+            <div class="weather-pill ms-auto" id="weather-box">
+                <span id="loc-icon"><div class="spinner-border spinner-border-sm" role="status"></div></span>
+                <span id="location">Syncing...</span>
+                <span class="opacity-25 mx-2">|</span>
+                <span class="d-flex align-items-center gap-1"><i class="bi bi-thermometer-half"></i> <span id="temp">--</span></span>
+                <span class="d-flex align-items-center gap-1 ms-3"><i class="bi bi-droplet-fill text-info"></i> <span id="humidity">--</span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="glass-container">
+        <div class="main-glass">
+            <div class="row g-0">
+                
+                <div class="col-lg-6 p-5 d-flex flex-column justify-content-center position-relative">
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-success bg-opacity-10 text-success fw-bold small border border-success border-opacity-25">
+                            <span class="spinner-grow spinner-grow-sm text-success" role="status"></span> System Online
+                        </span>
+                        <button class="btn-voice" onclick="toggleSpeech()" title="Assistant">
+                            <i class="bi bi-mic-fill" id="mic-icon"></i>
+                        </button>
                     </div>
 
-                    {% with messages = get_flashed_messages() %}
-                      {% if messages %}
-                        <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
-                          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                          <div>
-                            {% for message in messages %}
-                                {{ message }}
-                            {% endfor %}
-                          </div>
-                        </div>
-                      {% endif %}
-                    {% endwith %}
+                    <h1 class="hero-title display-4 mb-3">Next-Gen Crop <br>Diagnostics.</h1>
+                    <p class="text-secondary lead mb-5" style="font-weight: 500; font-size: 1.1rem;">
+                        Identify Pepper, Potato, and Tomato diseases with 
+                        <span class="text-dark fw-bold">Deep Learning Precision.</span>
+                        Just upload a leaf photo.
+                    </p>
 
-                    <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
-                        
-                        <div class="upload-area" id="dropArea" onclick="document.getElementById('file').click()">
-                            <i class="bi bi-cloud-arrow-up-fill upload-icon"></i>
-                            <h5>Click or Drag Image Here</h5>
-                            <p class="text-muted small">Supports JPG, PNG (Max 5MB)</p>
-                            
-                            <input class="form-control" type="file" name="file" id="file" hidden accept="image/*" required>
-                            
-                            <div id="preview-container">
-                                <p class="text-success fw-bold mb-2">Ready to Analyze:</p>
-                                <img id="image-preview" src="#" alt="Leaf Preview">
-                            </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="bi bi-crosshair stat-icon"></i>
+                            <span class="stat-val" data-target="98.5">%</span>
+                            <span class="stat-label">Accuracy</span>
                         </div>
-
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-analyze text-white">
-                                <i class="bi bi-search me-2"></i> Diagnose Now
-                            </button>
+                        <div class="stat-card">
+                            <i class="bi bi-lightning-charge-fill stat-icon"></i>
+                            <span class="stat-val" data-target="2">s</span>
+                            <span class="stat-label">Speed</span>
                         </div>
-                    </form>
-                    
-                    <div class="text-center mt-3">
-                        <small class="text-muted opacity-75">Powered by EfficientNetB0 & TensorFlow</small>
+                        <div class="stat-card">
+                            <i class="bi bi-database-fill stat-icon"></i>
+                            <span class="stat-val" data-target="15">K+</span>
+                            <span class="stat-label">Dataset</span>
+                        </div>
                     </div>
 
                 </div>
-            </div>
 
+                <div class="col-lg-6 upload-section">
+                    
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 py-2 mb-4 rounded-3">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="mb-4">
+                        <h3 class="fw-bold text-dark mb-1">Leaf Analysis</h3>
+                        <p class="text-muted">Supports JPG & PNG formats</p>
+                    </div>
+
+                    <form action="/predict" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <div class="drop-zone" id="dropArea" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" name="file" id="fileInput" hidden accept="image/*" required>
+                            
+                            <div class="scan-laser" id="laser"></div>
+
+                            <div id="dropContent">
+                                <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                    <i class="bi bi-cloud-arrow-up-fill text-success fs-1"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">Click to Upload</h5>
+                                <p class="text-muted small mb-0">or drag and drop here</p>
+                            </div>
+
+                            <img id="preview-img" src="#" alt="Preview">
+                        </div>
+
+                        <button type="submit" class="btn-analyze shadow-sm">
+                            <span>Run Diagnosis</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <small class="text-muted d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-shield-check text-success"></i> 
+                            Processed locally on secure server
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const dropArea = document.getElementById('dropArea');
-    const fileInput = document.getElementById('file');
-    const previewContainer = document.getElementById('preview-container');
-    const imagePreview = document.getElementById('image-preview');
-    const uploadForm = document.getElementById('uploadForm');
-    const loadingOverlay = document.getElementById('loadingOverlay');
+    <script>
+        // --- 1. GEO WEATHER (Real Data) ---
+        window.addEventListener('load', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(getWeather, noWeather);
+            } else {
+                noWeather();
+            }
+            runCounters();
+        });
 
-    // 1. Drag & Drop Visual Effects
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropArea.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            dropArea.classList.add('dragover');
-        }, false);
-    });
+        function getWeather(pos) {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            // Free Open-Meteo API
+            const api = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
 
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            dropArea.classList.remove('dragover');
-        }, false);
-    });
+            fetch(api)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('location').innerText = "Local Weather";
+                    document.getElementById('loc-icon').innerHTML = '<i class="bi bi-geo-alt-fill text-warning"></i>';
+                    document.getElementById('temp').innerText = `${Math.round(data.current.temperature_2m)}°C`;
+                    document.getElementById('humidity').innerText = `${data.current.relative_humidity_2m}%`;
+                })
+                .catch(noWeather);
+        }
 
-    // 2. Handle File Drop
-    dropArea.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        fileInput.files = files;
-        handleFiles(files);
-    });
+        function noWeather() {
+            document.getElementById('location').innerText = "Bengaluru";
+            document.getElementById('loc-icon').innerHTML = '<i class="bi bi-geo-alt-fill"></i>';
+            document.getElementById('temp').innerText = "27°C";
+            document.getElementById('humidity').innerText = "60%";
+        }
 
-    // 3. Handle Click Select
-    fileInput.addEventListener('change', function() {
-        handleFiles(this.files);
-    });
+        // --- 2. ANIMATED COUNTERS ---
+        function runCounters() {
+            const stats = document.querySelectorAll('.stat-val');
+            stats.forEach(stat => {
+                const target = parseFloat(stat.getAttribute('data-target'));
+                const suffix = stat.innerText.replace(/[0-9.]/g, ''); 
+                let count = 0;
+                const speed = target / 40; // Adjust for speed
 
-    // 4. Preview Logic
-    function handleFiles(files) {
-        if (files.length > 0) {
-            const file = files[0];
-            if (file.type.startsWith('image/')) {
+                const update = () => {
+                    count += speed;
+                    if(count < target) {
+                        stat.innerText = (target % 1 !== 0 ? count.toFixed(1) : Math.ceil(count)) + suffix;
+                        requestAnimationFrame(update);
+                    } else {
+                        stat.innerText = target + suffix;
+                    }
+                };
+                update();
+            });
+        }
+
+        // --- 3. UPLOAD UX ---
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const imgPreview = document.getElementById('preview-img');
+        const dropContent = document.getElementById('dropContent');
+        const laser = document.getElementById('laser');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.style.display = 'block';
-                    dropArea.querySelector('.upload-icon').style.display = 'none';
-                    dropArea.querySelector('h5').textContent = "Change Image";
-                    dropArea.querySelector('p').style.display = 'none';
+                reader.onload = (e) => {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    dropContent.style.display = 'none';
+                    laser.style.display = 'block';
                 }
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            if (fileInput.files.length > 0) {
+                document.getElementById('loader').style.display = 'flex';
+            }
+        });
+
+        // --- 4. VOICE ASSISTANT ---
+        let isSpeaking = false;
+        function toggleSpeech() {
+            const btn = document.querySelector('.btn-voice');
+            const icon = document.getElementById('mic-icon');
+            
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                btn.classList.remove('speaking');
+                icon.className = 'bi bi-mic-fill';
+            } else {
+                const msg = new SpeechSynthesisUtterance("Welcome to Crop Guard. Upload a clear leaf image, and I will analyze it instantly.");
+                msg.rate = 0.9;
+                msg.onend = () => {
+                    isSpeaking = false;
+                    btn.classList.remove('speaking');
+                    icon.className = 'bi bi-mic-fill';
+                };
+                window.speechSynthesis.speak(msg);
+                isSpeaking = true;
+                btn.classList.add('speaking');
+                icon.className = 'bi bi-soundwave';
             }
         }
-    }
-
-    // 5. Loading Animation on Submit
-    uploadForm.addEventListener('submit', function() {
-        if (fileInput.files.length > 0) {
-            loadingOverlay.style.display = 'flex';
-        }
-    });
-</script>
-
+    </script>
 </body>
 </html>
