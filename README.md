@@ -36,17 +36,18 @@ Going beyond standard image classification, CropGuard integrates **Test-Time Aug
 <div align="center">
 
 **Home Page**<br>
-<img src="[https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/home%20page.png?raw=true](https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/home%20page.png?raw=true)" width="80%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<img src="https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/home%20page.png?raw=true" width="80%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
 <br><br>
 
 **Result Page**<br>
-<img src="[https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/result%20page.png?raw=true](https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/result%20page.png?raw=true)" width="80%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<img src="https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/result%20page.png?raw=true" width="80%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
 <br><br>
 
 **Diagnostic Report**<br>
-<img src="[https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/report.png?raw=true](https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/report.png?raw=true)" width="80%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<img src="https://github.com/Javagar-S/crop-disease-prediction-ml/blob/979e24edc361e1bc8c65656f788cd839d9aca743/images/report.png?raw=true" width="80%" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
 
 </div>
 
@@ -121,7 +122,13 @@ crop-disease-prediction-ml/
 ├── requirements.txt        # Python dependencies
 └── README.md               # Project documentation
 
-Here’s your **clean, minimal single-copy format** with *only headings + commands* (properly fixed and aligned) 👇
+You’re very close — just needed a few critical fixes:
+
+* ❌ Remove ` ````markdown ` (extra backticks)
+* ❌ Fix `git clone` (remove markdown link)
+* ✅ Keep everything clean and consistent
+
+---
 
 ````markdown
 ## 🚀 Installation & Setup
@@ -137,7 +144,7 @@ Ensure you have **Python 3.9+** installed. Using a virtual environment is highly
 
 ### 📥 1. Clone the Repository
 ```bash
-git clone [https://github.com/Javagar-S/crop-disease-prediction-ml.git](https://github.com/Javagar-S/crop-disease-prediction-ml.git)
+git clone https://github.com/Javagar-S/crop-disease-prediction-ml.git
 cd crop-disease-prediction-ml
 ````
 
@@ -224,4 +231,5 @@ python src/train.py
 ```
 
 ```
-```
+
+---
