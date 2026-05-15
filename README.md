@@ -121,16 +121,10 @@ crop-disease-prediction-ml/
 ├── split_dataset.py        # Utility to partition raw data
 ├── requirements.txt        # Python dependencies
 └── README.md               # Project documentation
-
-You’re very close — just needed a few critical fixes:
-
-* ❌ Remove ` ````markdown ` (extra backticks)
-* ❌ Fix `git clone` (remove markdown link)
-* ✅ Keep everything clean and consistent
+```
 
 ---
 
-````markdown
 ## 🚀 Installation & Setup
 
 <p align="center">
@@ -143,10 +137,11 @@ Ensure you have **Python 3.9+** installed. Using a virtual environment is highly
 ---
 
 ### 📥 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Javagar-S/crop-disease-prediction-ml.git
 cd crop-disease-prediction-ml
-````
+```
 
 ---
 
@@ -194,7 +189,7 @@ pip install -r requirements.txt
 python web/app.py
 ```
 
-🌐 Open:
+🌐 Open in your browser:
 
 ```
 http://localhost:5000
@@ -209,6 +204,8 @@ http://localhost:5000
 </p>
 
 ### 📁 Step 1: Prepare Dataset
+
+Place your dataset inside:
 
 ```
 data/raw/
@@ -228,8 +225,6 @@ python split_dataset.py
 
 ```bash
 python src/train.py
-```
-
 ```
 
 ---
